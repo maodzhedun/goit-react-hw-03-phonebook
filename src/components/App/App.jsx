@@ -4,11 +4,24 @@ import { ContainerApp } from './App.styled';
 import Filter from 'components/Filter/Filter';
 import ContactList from 'components/ContactList/ContactList';
 import ContactForm from 'components/ContactForm/ContactForm';
+
+const LS_KEY = 'contact';
 class App extends Component {
   state = {
     contacts: [],
     filter: '',
   };
+
+  componentDidMount() {
+    if (localStorage.getItem(LS_KEY))
+      this.setState({ contacts: JSON.parse(localStorage.getItem(LS_KEY)) });
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem(LS_KEY, JSON.stringify(this.state.contacts));
+    }
+  }
 
   AddContact = (name, number) => {
     if (this.state.contacts.find(contact => contact.name === name)) {
@@ -45,7 +58,7 @@ class App extends Component {
   };
 
   render() {
-    const { filter } = this.state;
+    const { contacts, filter } = this.state;
 
     const visibleContacts = this.getVisibleContacts();
 
@@ -53,7 +66,7 @@ class App extends Component {
       <ContainerApp>
         <div>
           <h1>Phonebook</h1>
-          <ContactForm AddContact={this.AddContact} />
+          <ContactForm AddContact={this.AddContact} id={contacts.id} />
         </div>
         <div>
           <h2>Contacts</h2>
